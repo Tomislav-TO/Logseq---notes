@@ -1,0 +1,196 @@
+{
+  "main": {
+    "id": "add6fe4cb9770f9f",
+    "type": "split",
+    "children": [
+      {
+        "id": "c723f31c0dff10f1",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "e8a7c07ff4b9430b",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Dev Log - 2025-04-17.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Dev Log - 2025-04-17"
+            }
+          }
+        ]
+      },
+      {
+        "id": "9f2ca20ab3293131",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "0756cde1ed0dda78",
+            "type": "leaf",
+            "state": {
+              "type": "pdf",
+              "state": {
+                "file": "Dev Log - 2025-04-15.pdf"
+              },
+              "icon": "lucide-file-text",
+              "title": "Dev Log - 2025-04-15"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "ae7068cae567fcf3",
+    "type": "split",
+    "children": [
+      {
+        "id": "0cb3f5e67ab9faa6",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "9043c3e587f0f5e5",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "b99178c6ad4e5b30",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "209a1f00783979e6",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "10575192f0af6c4f",
+    "type": "split",
+    "children": [
+      {
+        "id": "983c63c63d8fb4eb",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "6722583a734cc4cd",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Dev Log - 2025-04-15.pdf",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for Dev Log - 2025-04-15"
+            }
+          },
+          {
+            "id": "de2f53d0bdee69f6",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Dev Log - 2025-04-15.pdf",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from Dev Log - 2025-04-15"
+            }
+          },
+          {
+            "id": "41603942734db33f",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "620e26db10992ef1",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Dev Log - 2025-04-15.pdf",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of Dev Log - 2025-04-15"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false
+    }
+  },
+  "active": "e8a7c07ff4b9430b",
+  "lastOpenFiles": [
+    "Dev Log - 2025-04-15.pdf",
+    "Dev Log - 2025-04-17.md",
+    "Dev Log - 2025-04-16.pdf",
+    "Untitled"
+  ]
+}
