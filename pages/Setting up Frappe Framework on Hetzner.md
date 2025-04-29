@@ -299,5 +299,251 @@
   
   With these configurations, Press should work correctly with your domain `logicna-podloga.com` on Cloudflare, allowing you to manage Frappe/ERPNext sites under your domain.
 -
--
--
+- 3. Press Server Setup Commands (each in its own file...mostly same process) like this:
+	- # Press Server Setup Commands
+	- ## Initial Setup
+	  
+	  ```
+	  bash
+	  
+	  ```
+	  *# Update package repositories*
+	  sudo apt update
+	  
+	  *# Install essential packages*
+	  sudo apt install -y curl wget git software-properties-common apt-transport-https ca-certificates gnupg lsb-release jq ufw
+	  
+	  *# Install Python dependencies*
+	  sudo apt install -y python3-dev python3-pip python3-setuptools python3-venv
+	  
+	  *# Install Node.js and npm*
+	  curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+	  sudo apt install -y nodejs
+	  
+	  *# Install yarn*
+	  sudo npm install -g yarn
+	  
+	  *# Install Redis*
+	  sudo apt install -y redis-server
+	  
+	  *# Install MariaDB client (to connect to DB server)*
+	  sudo apt install -y mariadb-client
+	  
+	  *# Install Supervisor*
+	  sudo apt install -y supervisor
+	  
+	  *# Install Docker*
+	  curl -fsSL https://get.docker.com -o get-docker.sh
+	  sudo sh get-docker.sh
+	  ```
+	  ```
+	- ## Create Frappe User
+	  
+	  ```
+	  bash
+	  
+	  ```
+	  *# Create frappe user*
+	  sudo adduser frappe
+	  
+	  *# Add to sudo and docker groups*
+	  sudo usermod -aG sudo frappe
+	  sudo usermod -aG docker frappe
+	  
+	  *# Switch to frappe user*
+	  su - frappe
+	  ```
+	  ```
+	- ## Install Bench and Initialize
+	  
+	  ```
+	  bash
+	  
+	  ```
+	  *# Install bench*
+	  pip3 install --user frappe-bench
+	  
+	  *# Add to PATH*
+	  echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+	  source ~/.bashrc
+	  
+	  *# Initialize new bench*
+	  bench init frappe-bench --frappe-branch version-14
+	  cd frappe-bench
+	  
+	  *# Create site (replace values with your information)*
+	  bench new-site press.logicna-podloga.com --mariadb-root-password YOUR_ROOT_DB_PASSWORD --admin-password YOUR_ADMIN_PASSWORD --db-host YOUR_DB_SERVER_IP
+	  
+	  *# Get press app*
+	  bench get-app press https://github.com/frappe/press
+	  bench --site press.logicna-podloga.com install-app press
+	  ```
+	  ```
+	- ## Configure Redis
+	  
+	  ```
+	  bash
+	  
+	  ```
+	  *# Create directories*
+	  mkdir -p ~/frappe-bench/config/pids
+	  
+	  *# Create Redis configuration for cache*
+	  echo "dbfilename redis_cache.rdb
+	  dir /home/frappe/frappe-bench/config/pids
+	  pidfile /home/frappe/frappe-bench/config/pids/redis_cache.pid
+	  bind 127.0.0.1
+	  port 13000
+	  maxmemory 4gb
+	  maxmemory-policy allkeys-lru
+	  appendonly no
+	  save \"\"" > ~/frappe-bench/config/redis_cache.conf
+	  
+	  *# Create Redis configuration for queue*
+	  echo "dbfilename redis_queue.rdb
+	  dir /home/frappe/frappe-bench/config/pids
+	  pidfile /home/frappe/frappe-bench/config/pids/redis_queue.pid
+	  bind 127.0.0.1
+	  port 11000
+	  maxmemory 4gb
+	  maxmemory-policy allkeys-lru
+	  appendonly no
+	  save \"\"" > ~/frappe-bench/config/redis_queue.conf
+	  ```
+	  ```
+	- ## Exit frappe user and configure supervisor
+	  
+	  ```
+	  bash
+	  
+	  ```
+	  *# Exit frappe user first*
+	  exit
+	  ```
+	  ```
+	- ## Configure Supervisor
+	  
+	  ```
+	  bash
+	  
+	  ```
+	  *# Create supervisor configuration*
+	  sudo mkdir -p /home/frappe/frappe-bench/logs
+	  sudo chown -R frappe:frappe /home/frappe/frappe-bench/logs
+	  
+	  sudo tee /etc/supervisor/conf.d/frappe-bench.conf > /dev/null << 'EOF'
+	  [program:frappe-web]
+	  command=/home/frappe/.local/bin/bench serve --port 8000
+	  user=frappe
+	  directory=/home/frappe/frappe-bench
+	  autostart=true
+	  autorestart=true
+	  stdout_logfile=/home/frappe/frappe-bench/logs/web.log
+	  stderr_logfile=/home/frappe/frappe-bench/logs/web.error.log
+	  
+	  [program:frappe-schedule]
+	  command=/home/frappe/.local/bin/bench schedule
+	  user=frappe
+	  directory=/home/frappe/frappe-bench
+	  autostart=true
+	  autorestart=true
+	  stdout_logfile=/home/frappe/frappe-bench/logs/schedule.log
+	  stderr_logfile=/home/frappe/frappe-bench/logs/schedule.error.log
+	  
+	  [program:frappe-worker-default]
+	  command=/home/frappe/.local/bin/bench worker --queue default
+	  user=frappe
+	  directory=/home/frappe/frappe-bench
+	  autostart=true
+	  autorestart=true
+	  stdout_logfile=/home/frappe/frappe-bench/logs/worker-default.log
+	  stderr_logfile=/home/frappe/frappe-bench/logs/worker-default.error.log
+	  
+	  [program:frappe-worker-short]
+	  command=/home/frappe/.local/bin/bench worker --queue short
+	  user=frappe
+	  directory=/home/frappe/frappe-bench
+	  autostart=true
+	  autorestart=true
+	  stdout_logfile=/home/frappe/frappe-bench/logs/worker-short.log
+	  stderr_logfile=/home/frappe/frappe-bench/logs/worker-short.error.log
+	  
+	  [program:frappe-worker-long]
+	  command=/home/frappe/.local/bin/bench worker --queue long
+	  user=frappe
+	  directory=/home/frappe/frappe-bench
+	  autostart=true
+	  autorestart=true
+	  stdout_logfile=/home/frappe/frappe-bench/logs/worker-long.log
+	  stderr_logfile=/home/frappe/frappe-bench/logs/worker-long.error.log
+	  
+	  [program:frappe-redis-cache]
+	  command=redis-server /home/frappe/frappe-bench/config/redis_cache.conf
+	  user=frappe
+	  directory=/home/frappe/frappe-bench/
+	  autostart=true
+	  autorestart=true
+	  stdout_logfile=/home/frappe/frappe-bench/logs/redis-cache.log
+	  stderr_logfile=/home/frappe/frappe-bench/logs/redis-cache.error.log
+	  
+	  [program:frappe-redis-queue]
+	  command=redis-server /home/frappe/frappe-bench/config/redis_queue.conf
+	  user=frappe
+	  directory=/home/frappe/frappe-bench/
+	  autostart=true
+	  autorestart=true
+	  stdout_logfile=/home/frappe/frappe-bench/logs/redis-queue.log
+	  stderr_logfile=/home/frappe/frappe-bench/logs/redis-queue.error.log
+	  
+	  [program:frappe-socketio]
+	  command=node /home/frappe/frappe-bench/apps/frappe/socketio.js
+	  user=frappe
+	  directory=/home/frappe/frappe-bench
+	  autostart=true
+	  autorestart=true
+	  stdout_logfile=/home/frappe/frappe-bench/logs/socketio.log
+	  stderr_logfile=/home/frappe/frappe-bench/logs/socketio.error.log
+	  
+	  [group:frappe]
+	  programs=frappe-web,frappe-schedule,frappe-worker-default,frappe-worker-short,frappe-worker-long,frappe-redis-cache,frappe-redis-queue,frappe-socketio
+	  EOF
+	  
+	  *# Update supervisor*
+	  sudo supervisorctl reread
+	  sudo supervisorctl update
+	  sudo supervisorctl start all
+	  ```
+	  ```
+	- ## Configure Firewall
+	  
+	  ```
+	  bash
+	  
+	  ```
+	  *# Allow SSH*
+	  sudo ufw allow 22/tcp
+	  
+	  *# Allow connections from your Proxy server (replace with your actual Proxy server IP)*
+	  sudo ufw allow from PROXY_SERVER_IP to any port 8000,9000 proto tcp
+	  
+	  *# Enable the firewall*
+	  sudo ufw enable
+	  ```
+	  ```
+	- ## Final Setup
+	  
+	  ```
+	  bash
+	  
+	  ```
+	  *# Switch back to frappe user for bench commands*
+	  su - frappe
+	  cd frappe-bench
+	  
+	  *# Build assets*
+	  bench build
+	  
+	  *# Additional site configuration*
+	  bench --site press.logicna-podloga.com set-config host_name press.logicna-podloga.com
+	  ```
+	  ```
