@@ -23,6 +23,17 @@
 	-
 	- # Press Server Setup Commands
 	- ## Initial Setup
+	- These steps needed for all thes ervers...steps mostly the same
+	- Ask sonet if confused
 	-
+	- # Proxy Server Setup Commands
+	- ## Initial Setup
+	-
+	- # Database Server Setup Commands
+	- ## Initial Setup
+	-
+	- # Cloudflare DNS Setup for Press
+	  
+	  This guide explains how to configure Cloudflare DNS for your Press installation with `logicna-podloga.com` domain.
 	-
 	-
