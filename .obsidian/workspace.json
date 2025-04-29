@@ -63,9 +63,23 @@
               "icon": "lucide-file",
               "title": "Frappe Framework"
             }
+          },
+          {
+            "id": "8f95b8684b8106ce",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "CouldFlare token.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "CouldFlare token"
+            }
           }
         ],
-        "currentTab": 3
+        "currentTab": 4
       },
       {
         "id": "9f2ca20ab3293131",
@@ -229,10 +243,11 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "8314cb2dbfc92620",
+  "active": "8f95b8684b8106ce",
   "lastOpenFiles": [
-    "Python.md",
     "Frappe Framework.md",
+    "CouldFlare token.md",
+    "Python.md",
     "Agile.md",
     "journals/2025_04_25.md",
     "journals/2025_04_18.md",
