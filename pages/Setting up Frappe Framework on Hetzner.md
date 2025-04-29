@@ -8,3 +8,6 @@
 	- Ok give me datails guide and steps to setup and connect each server..i have three of em
 	- how to setup the domain, my dmain is logicna-podloga.com, i am using cloud flare
 	- this 1st step about cloudflare IPs is that valid for all servers?
+	- when you are guiding me, make sure to guide me on packages that are needed to be installed. This is a fresh install with nothing installed
+	- separate each server commands in a file
+	- I need wheel with pipx, why did you not say
