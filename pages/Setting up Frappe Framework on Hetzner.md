@@ -21,3 +21,8 @@
 	- Add DNS Records
 	- Cloudflare SSL/TLS Settings
 	-
+	- # Press Server Setup Commands
+	- ## Initial Setup
+	-
+	-
+	-
