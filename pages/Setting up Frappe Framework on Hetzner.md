@@ -5,4 +5,4 @@
 - and ask with something like "Help me set uppress on cloud on Hetzner"
 - important things is that we always ask more detailos or set new requirments when hes doing it wrong...for example
 	- how many minimum servers needed for setup?
-	-
+	- Ok give me datails guide and steps to setup and connect each server..i have three of em
