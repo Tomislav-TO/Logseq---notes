@@ -9,4 +9,15 @@
 -
 - 2.Setting Up Press with Your Domain on Cloudflare
 	- for our domain for example idk logicna-podloga.com using cloudflare as dns provider.
+	- We need to have 3 servers set up on hetzner
+	- ## Domain and Subdomain Structure
+	  
+	  For a Press installation, you'll need to create several subdomains:
+	- **Press Dashboard**: `press.logicna-podloga.com` (main interface)
+	- **Proxy Server**: `proxy.logicna-podloga.com`
+	- **Database Server**: `db.logicna-podloga.com`
+	- **Wildcard Domain**: `*.logicna-podloga.com` (for dynamically created sites)
+	- Cloudflare DNS Configuration
+	- Add DNS Records
+	- Cloudflare SSL/TLS Settings
 	-
