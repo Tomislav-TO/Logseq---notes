@@ -7,4 +7,6 @@
 - Ok give me datails guide and steps to setup and connect each server..i have three of em
 - how to setup the domain, my dmain is logicna-podloga.com, i am using cloud flare
 -
-- 2.
+- 2.Setting Up Press with Your Domain on Cloudflare
+	- for our domain for example idk logicna-podloga.com using cloudflare as dns provider.
+	-
