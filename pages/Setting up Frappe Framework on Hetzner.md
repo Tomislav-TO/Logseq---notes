@@ -21,10 +21,11 @@
 	- Add DNS Records
 	- Cloudflare SSL/TLS Settings
 	-
-	- # Press Server Setup Commands
-	- ## Initial Setup
-	- These steps needed for all thes ervers...steps mostly the same
-	- Ask sonet if confused
+	- # Press Server Setup Commans
+		- # Press Server Setup Commands
+		- ## Initial Setup
+		- These steps needed for all thes ervers...steps mostly the same
+		- Ask sonet if confused
 	-
 	- # Proxy Server Setup Commands
 	- ## Initial Setup
