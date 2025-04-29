@@ -21,7 +21,7 @@
 	- Add DNS Records
 	- Cloudflare SSL/TLS Settings
 	-
-	- # For each Server before we go for Press server setup commands, we need to go into that server on terminal with ssh root@Server-IP (add ip of corespoding server). After finishing all setup for each server...
+	- # For each Server before we go for Press server setup commands, we need to go into that server on terminal with ssh root@Server-IP (add ip of corespoding server). After finishing all setup for each server...exit all the way needed and enter another server and again setup all comands
 		- # Press Server Setup Commands
 		- ## Initial Setup
 		- These steps needed for all thes ervers...steps mostly the same
