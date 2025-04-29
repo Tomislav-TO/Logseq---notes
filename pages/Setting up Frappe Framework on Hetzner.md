@@ -4,4 +4,7 @@
 - set new instruction for example "Help me setting up press on Hetzner"
 - and ask with something like "Help me set uppress on cloud on Hetzner"
 - How many servers needed
+- Ok give me datails guide and steps to setup and connect each server..i have three of em
+- how to setup the domain, my dmain is logicna-podloga.com, i am using cloud flare
 -
+- 2.
