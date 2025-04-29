@@ -21,20 +21,20 @@
 	- Add DNS Records
 	- Cloudflare SSL/TLS Settings
 	-
-	- # Press Server Setup Commans
+	- # For each Server before we go for Press server setup commands, we need to go
 		- # Press Server Setup Commands
 		- ## Initial Setup
 		- These steps needed for all thes ervers...steps mostly the same
 		- Ask sonet if confused
 	-
-	- # Proxy Server Setup Commands
-	- ## Initial Setup
+		- # Proxy Server Setup Commands
+		- ## Initial Setup
 	-
-	- # Database Server Setup Commands
-	- ## Initial Setup
+		- # Database Server Setup Commands
+		- ## Initial Setup
 	-
-	- # Cloudflare DNS Setup for Press
-	  
-	  This guide explains how to configure Cloudflare DNS for your Press installation with `logicna-podloga.com` domain.
+		- # Cloudflare DNS Setup for Press
+		  
+		  This guide explains how to configure Cloudflare DNS for your Press installation with `logicna-podloga.com` domain.
 	-
 	-
