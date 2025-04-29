@@ -298,3 +298,6 @@
 - **DNS Not Propagating**: Cloudflare typically propagates DNS changes quickly, but you can use `dig @1.1.1.1 press.logicna-podloga.com` to check if Cloudflare's DNS servers have updated.
   
   With these configurations, Press should work correctly with your domain `logicna-podloga.com` on Cloudflare, allowing you to manage Frappe/ERPNext sites under your domain.
+-
+-
+-
