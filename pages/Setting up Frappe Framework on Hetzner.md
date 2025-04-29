@@ -6,3 +6,5 @@
 - important things is that we always ask more detailos or set new requirments when hes doing it wrong...for example
 	- how many minimum servers needed for setup?
 	- Ok give me datails guide and steps to setup and connect each server..i have three of em
+	- how to setup the domain, my dmain is logicna-podloga.com, i am using cloud flare
+	- this 1st step about cloudflare IPs is that valid for all servers?
