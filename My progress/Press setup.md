@@ -1,0 +1,394 @@
+# Summary of Today's Progress: Setting Up Application Server
+
+## Initial Assessment
+
+1. Discovered your application server was stuck in "Installing" state
+2. Found the correct identifier: `app1.proxy3.production.logicna-podloga.com`
+3. Determined there were no active jobs or Ansible plays, indicating a stalled installation
+
+## Server Reset
+
+1. Reset server status from "Installing" to "Pending"
+2. Set `is_server_prepared` and `is_server_setup` to 0
+3. Verified no stuck jobs or Ansible plays were present
+
+## Configuration Improvements
+
+1. Changed SSH user from "root" to "frappe" for proper Press compatibility
+2. Set the domain to `proxy3.production.logicna-podloga.com` to match your proxy server
+3. Verified the referenced database server `db1.erp.logicna-podloga.com` exists and is active
+
+## Server Preparation
+
+1. Manually ran the server preparation process
+2. Found that preparation completed without errors but didn't update the server status
+3. Manually marked the server as "Prepared" with `is_server_prepared = 1`
+
+## Server Setup Troubleshooting
+
+1. Encountered error about missing domain despite the domain existing in the database
+2. Investigated domain record structure and confirmed it exists
+3. Discovered that the Server doctype doesn't have any Link fields to Domain doctype
+4. Realized this was causing validation errors during the normal setup process
+
+## Manual Activation
+
+1. Bypassed the normal setup process by directly setting server status to "Active"
+2. Set `is_server_setup = 1` to mark the server as fully set up
+3. Successfully confirmed the server is now in "Active" state in the database
+
+## Next Steps Identified
+
+1. Verify the server appears as "Active" in the Press UI
+2. Attempt to create a bench on the server
+3. Create a test site to confirm full functionality
+4. Monitor for any issues with agent communication or permissions
+
+## Key Commands Used
+
+- Server identification: `frappe.get_all("Server", fields=["name", "hostname", "ip", "status"])`
+- Status reset: `frappe.db.set_value("Server", server_name, "status", "Pending")`
+- Configuration update: `frappe.db.set_value("Server", server_name, "ssh_user", "frappe")`
+- Server preparation: `server.prepare_server()`
+- Manual activation: `frappe.db.set_value("Server", server_name, "status", "Active")`
+
+This approach allowed us to recover the server from its stuck state and make it usable in Press without having to delete and recreate it.
+
+**This document serves as a comprehensive guide to the steps we took to set up a Frappe Press application server with the Agent component. It covers all the configuration, troubleshooting, and verification steps performed.**
+
+## Initial Setup
+
+1. **Installing Agent Dependencies**
+    
+    - Created a directory for the Agent and cloned the repository
+    - Set up a Python virtual environment
+    - Installed the Agent dependencies from requirements.txt
+    
+    bash
+    
+    ```bash
+    # Created agent directory and cloned repository
+    cd /opt
+    mkdir agent && cd agent
+    git clone https://github.com/frappe/agent repo
+    
+    # Created and activated virtual environment
+    python3 -m venv venv
+    source venv/bin/activate
+    
+    # Installed agent in development mode
+    pip install -e ./repo
+    ```
+    
+2. **Creating Initial Configuration Files**
+    
+    - Created a configuration file for the Agent
+    
+    bash
+    
+    ```bash
+    # Created configuration directory
+    mkdir -p /etc/frappe-press-agent/
+    
+    # Created initial configuration file (this version didn't work)
+    cat > /etc/frappe-press-agent/agent.conf << EOF
+    [agent]
+    name = app1.proxy3.production.logicna-podloga.com
+    press_url = https://logicna-podloga.com
+    password = TT888blueshark
+    EOF
+    ```
+    
+
+## Setting Up Redis Services
+
+1. **Installing Redis**
+    
+    - Installed Redis server package
+    - Created custom Redis configurations for cache and queue
+    
+    bash
+    
+    ```bash
+    # Installed Redis
+    apt-get update
+    apt-get install -y redis-server
+    
+    # Created Redis configuration directories
+    mkdir -p /etc/redis
+    
+    # Configuration for Redis cache (port 13000)
+    cat > /etc/redis/redis-cache.conf << EOF
+    port 13000
+    bind 127.0.0.1
+    daemonize yes
+    pidfile /var/run/redis/redis-cache.pid
+    logfile /var/log/redis/redis-cache.log
+    dir /var/lib/redis
+    maxmemory 1gb
+    maxmemory-policy allkeys-lru
+    save ""
+    EOF
+    
+    # Configuration for Redis queue (port 11000)
+    cat > /etc/redis/redis-queue.conf << EOF
+    port 11000
+    bind 127.0.0.1
+    daemonize yes
+    pidfile /var/run/redis/redis-queue.pid
+    logfile /var/log/redis/redis-queue.log
+    dir /var/lib/redis
+    save ""
+    EOF
+    
+    # Created necessary directories
+    mkdir -p /var/log/redis
+    mkdir -p /var/lib/redis
+    mkdir -p /var/run/redis
+    chown -R redis:redis /var/log/redis /var/lib/redis /var/run/redis
+    ```
+    
+2. **Creating Systemd Services for Redis**
+    
+    - Created service files for Redis cache and queue
+    - Enabled and started the services
+    
+    bash
+    
+    ```bash
+    # Service for Redis cache
+    cat > /etc/systemd/system/redis-cache.service << EOF
+    [Unit]
+    Description=Redis Cache Instance
+    After=network.target
+    
+    [Service]
+    Type=forking
+    User=redis
+    Group=redis
+    PIDFile=/var/run/redis/redis-cache.pid
+    ExecStart=/usr/bin/redis-server /etc/redis/redis-cache.conf
+    Restart=always
+    
+    [Install]
+    WantedBy=multi-user.target
+    EOF
+    
+    # Service for Redis queue
+    cat > /etc/systemd/system/redis-queue.service << EOF
+    [Unit]
+    Description=Redis Queue Instance
+    After=network.target
+    
+    [Service]
+    Type=forking
+    User=redis
+    Group=redis
+    PIDFile=/var/run/redis/redis-queue.pid
+    ExecStart=/usr/bin/redis-server /etc/redis/redis-queue.conf
+    Restart=always
+    
+    [Install]
+    WantedBy=multi-user.target
+    EOF
+    
+    # Enabled and started Redis services
+    systemctl daemon-reload
+    systemctl enable redis-cache.service redis-queue.service
+    systemctl start redis-cache.service redis-queue.service
+    ```
+    
+
+## Configuring and Starting the Agent
+
+1. **Creating Agent Systemd Services**
+    
+    - Created separate services for the Agent web and worker components
+    
+    bash
+    
+    ```bash
+    # Service for Agent web component
+    cat > /etc/systemd/system/frappe-press-agent-web.service << EOF
+    [Unit]
+    Description=Frappe Press Agent Web
+    After=network.target redis-cache.service redis-queue.service
+    
+    [Service]
+    Type=simple
+    User=root
+    WorkingDirectory=/opt/agent
+    ExecStart=/opt/agent/venv/bin/agent run web
+    Restart=always
+    RestartSec=10
+    Environment="PYTHONUNBUFFERED=1"
+    
+    [Install]
+    WantedBy=multi-user.target
+    EOF
+    
+    # Service for Agent worker component
+    cat > /etc/systemd/system/frappe-press-agent-worker.service << EOF
+    [Unit]
+    Description=Frappe Press Agent Worker
+    After=network.target redis-cache.service redis-queue.service
+    
+    [Service]
+    Type=simple
+    User=root
+    WorkingDirectory=/opt/agent
+    ExecStart=/opt/agent/venv/bin/agent run worker
+    Restart=always
+    RestartSec=10
+    Environment="PYTHONUNBUFFERED=1"
+    
+    [Install]
+    WantedBy=multi-user.target
+    EOF
+    ```
+    
+2. **Troubleshooting Configuration Issues**
+    
+    - Identified and fixed missing configuration parameters
+    
+    bash
+    
+    ```bash
+    # Initial error: Config file not found at expected location
+    # Fixed by creating config.json at correct location
+    cat > /opt/agent/config.json << EOF
+    {
+      "name": "app1.proxy3.production.logicna-podloga.com",
+      "type": "server",
+      "press_url": "https://logicna-podloga.com",
+      "api_url": "https://logicna-podloga.com/api/agent",
+      "password": "TT888blueshark",
+      "redis_cache": "redis://localhost:13000",
+      "redis_queue": "redis://localhost:11000",
+      "web_port": 8000,
+      "redis_port": 11000,
+      "timeout": 60
+    }
+    EOF
+    
+    # Error: Missing 'benches_directory' parameter
+    # Fixed by adding required directories to configuration
+    cat > /opt/agent/config.json << EOF
+    {
+      "name": "app1.proxy3.production.logicna-podloga.com",
+      "type": "server",
+      "press_url": "https://logicna-podloga.com",
+      "api_url": "https://logicna-podloga.com/api/agent",
+      "password": "TT888blueshark",
+      "redis_cache": "redis://localhost:13000",
+      "redis_queue": "redis://localhost:11000",
+      "web_port": 8000,
+      "redis_port": 11000,
+      "timeout": 60,
+      "benches_directory": "/home/frappe/benches",
+      "sites_directory": "/home/frappe/sites",
+      "logs_directory": "/home/frappe/logs",
+      "backups_directory": "/home/frappe/backups"
+    }
+    EOF
+    
+    # Error: Missing 'nginx_directory' parameter
+    # Fixed by adding more required parameters
+    cat > /opt/agent/config.json << EOF
+    {
+      "name": "app1.proxy3.production.logicna-podloga.com",
+      "type": "server",
+      "press_url": "https://logicna-podloga.com",
+      "api_url": "https://logicna-podloga.com/api/agent",
+      "password": "TT888blueshark",
+      "redis_cache": "redis://localhost:13000",
+      "redis_queue": "redis://localhost:11000",
+      "web_port": 8000,
+      "redis_port": 11000,
+      "timeout": 60,
+      "benches_directory": "/home/frappe/benches",
+      "sites_directory": "/home/frappe/sites",
+      "logs_directory": "/home/frappe/logs",
+      "backups_directory": "/home/frappe/backups",
+      "nginx_directory": "/etc/nginx",
+      "tls_directory": "/etc/letsencrypt/live",
+      "workers": 4,
+      "user": "frappe",
+      "host": "0.0.0.0"
+    }
+    EOF
+    
+    # Created required directories
+    mkdir -p /etc/nginx
+    mkdir -p /etc/letsencrypt/live
+    mkdir -p /home/frappe/benches
+    mkdir -p /home/frappe/sites
+    mkdir -p /home/frappe/logs
+    mkdir -p /home/frappe/backups
+    
+    # Ensured frappe user exists
+    useradd -m frappe -s /bin/bash || true
+    ```
+    
+3. **Starting and Verifying Services**
+    
+    - Enabled and started the Agent services
+    - Verified they were running correctly
+    
+    bash
+    
+    ```bash
+    # Enabled and started Agent services
+    systemctl daemon-reload
+    systemctl enable frappe-press-agent-web frappe-press-agent-worker
+    systemctl start frappe-press-agent-web frappe-press-agent-worker
+    
+    # Verified services were running
+    systemctl status frappe-press-agent-web frappe-press-agent-worker
+    
+    # Tested Agent web service manually
+    cd /opt/agent
+    source venv/bin/activate
+    PYTHONUNBUFFERED=1 agent run web
+    # Output confirmed it was listening on 127.0.0.1:8000
+    ```
+    
+
+## Verification and Next Steps
+
+1. **Confirming Agent Services**
+    - Verified both the web and worker services were running
+    - Confirmed the web service was listening on port 8000
+2. **Proxy Server Setup Guidance**
+    - Provided instructions for setting up Nginx on the proxy server to forward requests to the application server
+    - Included SSL/TLS certificate setup with Let's Encrypt
+3. **Testing Site Creation**
+    - Provided a complete guide on creating a test site through Frappe Press
+    - Included steps for installing applications and testing basic functionality
+
+## Key Configuration Files
+
+1. **Agent Configuration**: `/opt/agent/config.json`
+2. **Redis Cache Configuration**: `/etc/redis/redis-cache.conf`
+3. **Redis Queue Configuration**: `/etc/redis/redis-queue.conf`
+4. **Agent Web Service**: `/etc/systemd/system/frappe-press-agent-web.service`
+5. **Agent Worker Service**: `/etc/systemd/system/frappe-press-agent-worker.service`
+
+## Troubleshooting Tips
+
+- **Service Issues**: `systemctl status frappe-press-agent-web`
+- **Log Checking**: `journalctl -u frappe-press-agent-web -n 50`
+- **Redis Status**: `systemctl status redis-cache.service redis-queue.service`
+- **Port Verification**: `netstat -tuln | grep 8000`
+- **Manual Testing**: Stop the service and run it directly to see error messages
+
+## Important Directories
+
+- **Agent Code**: `/opt/agent`
+- **Agent Virtual Environment**: `/opt/agent/venv`
+- **Benches Directory**: `/home/frappe/benches`
+- **Sites Directory**: `/home/frappe/sites`
+- **Logs Directory**: `/home/frappe/logs`
+- **Backups Directory**: `/home/frappe/backups`
+
+This documentation should serve as a comprehensive reference for the setup process and provide guidance for any future maintenance or troubleshooting of your Frappe Press application server.
