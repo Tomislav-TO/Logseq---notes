@@ -69,12 +69,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "My progress/Press setup.md",
+                "file": "My progress/Initial testing.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Press setup"
+              "title": "Initial testing"
             }
           }
         ],
@@ -227,11 +227,12 @@
   },
   "active": "8f95b8684b8106ce",
   "lastOpenFiles": [
+    "My progress/Press setup.md",
+    "My progress/Initial testing.md",
     "logseq/bak/My progress/Press setup/2025-05-16T06_26_04.488Z.Desktop.md",
     "logseq/bak/My progress/Press setup",
     "logseq/bak/My progress",
     "Untitled.md",
-    "My progress/Press setup.md",
     "CouldFlare token.md",
     "My progress",
     "Frappe Framework.md",

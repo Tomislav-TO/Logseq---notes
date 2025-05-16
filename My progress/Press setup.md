@@ -392,4 +392,3 @@ This approach allowed us to recover the server from its stuck state and make it 
 - **Backups Directory**: `/home/frappe/backups`
 
 This documentation should serve as a comprehensive reference for the setup process and provide guidance for any future maintenance or troubleshooting of your Frappe Press application server.
-
